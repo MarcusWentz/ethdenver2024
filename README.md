@@ -7,3 +7,7 @@ Verify ChatGPT output with JSON API response verification.
 Concept idea 2:
 
 Verify credit score based on chain loan data to save gas.
+
+Concept idea 3:
+
+Verify total trading volume on DEXs for HarryPotterObamaSonic10Inu (ETH) to get listed on CEXs. 

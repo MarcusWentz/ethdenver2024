@@ -1,7 +1,10 @@
-use std::error::Error;
+use http::Request;
 
-fn main() -> Result<(), Box<dyn Error>> {
-    let resp = reqwest::blocking::get("https://httpbin.org/ip")?.text()?;
-    println!("{:#?}", resp);
-    Ok(())
+fn main() {
+    let request = Request::builder()
+      .uri("https://www.rust-lang.org/")
+      .header("User-Agent", "awesome/1.0")
+      .body(())
+      .unwrap();
+    println!("{:?}",request);
 }

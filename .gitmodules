@@ -1,0 +1,6 @@
+[submodule "MP-SPDZ"]
+	path = MP-SPDZ
+	url = https://github.com/mrnerdhair/MP-SPDZ
+[submodule "tls_garble"]
+	path = tls_garble
+	url = https://github.com/mrnerdhair/tls_garble

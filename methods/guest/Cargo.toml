@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 json = "0.12"
 http = "1.0.0"
+httparse = "1.8.0"
 json-core = { path = "../../core" }
 # If you want to try (experimental) std support, add `features = [ "std" ]` to risc0-zkvm
 risc0-zkvm = { version = "0.20.1", default-features = false, features = [ "std" ] }

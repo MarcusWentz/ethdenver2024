@@ -31,6 +31,15 @@ fn main() {
     let complete_record = "1703030043a23f7054b62c94d0affafe8228ba55cbefacea42f914aa66bcab3f2b9819a8a5b46b395bd54a9a20441e2b62974e1f5a6292a2977014bd1e3deae63aeebb21694915e4";
     println!("{:?}",complete_record);
 
+    let record_first_three_bytes = &complete_record[0..6];
+    println!("{:?}",record_first_three_bytes);
+
+    if record_first_three_bytes != "170303" {
+        println!("ERROR: Encoded hex string does not start with 170303.");
+        return;
+    }
+    println!("Encoded hex string starts with 170303 as expected.");
+
     let decoded_string = hex::decode(complete_record);
     println!("{:?}", decoded_string); // 
 

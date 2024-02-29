@@ -1,5 +1,12 @@
 # ethdenver2024
 
+## Run
+
+In root path, run
+```shell
+RISC0_DEV_MODE=1 cargo run --release
+```
+
 ## Project ideas
 
 Idea 1:

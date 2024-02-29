@@ -29,27 +29,33 @@ ordered list of messages, either client or server
 start - 
 decapsulate a tls record
 
+- [x]
 17 03 03 - always first bytes
 u16 big endian length field - check that it matches
 rest if cyphertext
 last 16 bytes are authtag, but 
 pass the rest in
 
-assuming wee know the key
+- [ ] 
+(assuming we know the key)
 when we decrypt it
 
+- [ ] 
 need aes 128 gcm library to decrypt it
 feed it the key and bag of bytes
 and will get back plaintext
 
-once you have plaintext - 
-strip any trailing 0 bytes
-strip last nonzero byte - check that it's equl to 17(hex)
-which is tag for application data
+- [ ] 
+once you have plaintext -
+   - [ ] 
+   strip any trailing 0 bytes
+   - [ ]
+  strip last nonzero byte - check that it's equl to 17 (hex) which is tag for application data
 
 will be http traffic
 
--inputs to aes gcm function
+- [ ] 
+inputs to aes gcm function
    {client}  derive write traffic keys for application data:
 
       PRK (32 octets):  9e 40 64 6c e7 9a 7f 9d c0 5a f8 88 9b ce 65 52

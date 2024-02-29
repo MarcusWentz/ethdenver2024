@@ -10,17 +10,52 @@ risc0_zkvm::guest::entry!(main);
 
 use aes_gcm::{
     aead::{Aead, AeadCore, KeyInit, OsRng},
-    Aes256Gcm,
-    Key, // Or `Aes128Gcm`
-    Nonce,
+    aes::cipher::BlockCipher,
+    AeadInPlace, Aes128Gcm, Aes256Gcm, Key, Nonce,
 };
+use hex;
 use http::{Request, Response, Version};
 use httparse::Request as ParsedRequest;
 use httparse::Response as ParsedResponse;
 use json::parse;
 use json_core::Outputs;
 
+// Decodes IN PLACE - mutates the input ciphertext
+fn decode_message(
+    ciphertext_vec: &mut Vec<u8>,
+    associated_data_vec: &Vec<u8>,
+    iv_expanded: &[u8; 12],
+    key_expanded: &[u8; 16],
+) {
+    let cipher = Aes128Gcm::new(key_expanded.into());
+    let nonce = iv_expanded;
+    let success = cipher.decrypt_in_place(nonce.into(), associated_data_vec, ciphertext_vec);
+    assert!(success.is_ok());
+}
+
 fn main() {
+    // Decoding message example
+    let iv_expanded: [u8; 12] = [
+        0x5b, 0x78, 0x92, 0x3d, 0xee, 0x08, 0x57, 0x90, 0x33, 0xe5, 0x23, 0xd9,
+    ];
+    let key_expanded: [u8; 16] = [
+        0x17, 0x42, 0x2d, 0xda, 0x59, 0x6e, 0xd5, 0xd9, 0xac, 0xd8, 0x90, 0xe3, 0xc6, 0x3f, 0x50,
+        0x51,
+    ];
+
+    let ciphertext = "a23f7054b62c94d0affafe8228ba55cbefacea42f914aa66bcab3f2b9819a8a5b46b395bd54a9a20441e2b62974e1f5a6292a2977014bd1e3deae63aeebb21694915e4";
+    let associated_data = "1703030043";
+    let mut ciphertext_vec = hex::decode(ciphertext).unwrap();
+    let associated_data_vec = hex::decode(associated_data).unwrap();
+
+    decode_message(
+        &mut ciphertext_vec,
+        &associated_data_vec,
+        &iv_expanded,
+        &key_expanded,
+    );
+    println!("RESULT:");
+    println!("{:?}", ciphertext_vec);
 
     //Test
     // let complete_record = "17 03 03 00 43 a2 3f 70 54 b6 2c 94
@@ -29,10 +64,10 @@ fn main() {
     // 92 a2 97 70 14 bd 1e 3d ea e6 3a ee bb 21 69 49 15 e4";
     // Removed white spaces with: https://www.browserling.com/tools/remove-all-whitespace
     let complete_record = "1703030043a23f7054b62c94d0affafe8228ba55cbefacea42f914aa66bcab3f2b9819a8a5b46b395bd54a9a20441e2b62974e1f5a6292a2977014bd1e3deae63aeebb21694915e4";
-    println!("{:?}",complete_record);
+    println!("{:?}", complete_record);
 
     let record_first_three_bytes = &complete_record[0..6];
-    println!("{:?}",record_first_three_bytes);
+    println!("{:?}", record_first_three_bytes);
 
     if record_first_three_bytes != "170303" {
         println!("ERROR: Encoded hex string does not start with 170303.");
@@ -41,9 +76,9 @@ fn main() {
     println!("Encoded hex string starts with 170303 as expected.");
 
     let decoded_string = hex::decode(complete_record);
-    println!("{:?}", decoded_string); // 
+    println!("{:?}", decoded_string); //
 
-    //Input 
+    //Input
     let data: String = env::read();
     let sha = *Impl::hash_bytes(&data.as_bytes());
 

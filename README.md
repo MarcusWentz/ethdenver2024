@@ -7,25 +7,13 @@ In root path, run
 RISC0_DEV_MODE=1 cargo run --release
 ```
 
-## Project ideas
+## Idea 1 - Verify TLS communication - TO DO LIST
 
-Idea 1:
-
-Verify ChatGPT output with JSON API response verification.
-
-Idea 2:
-
-Verify credit score based on chain loan data to save gas.
-
-Idea 3:
-
-Verify total trading volume on DEXs for HarryPotterObamaSonic10Inu (ETH) to get listed on CEXs. 
-
-## Idea 1 Next Steps
-
+- [ ] 
 get an enum
 ordered list of messages, either client or server
 
+- [ ] 
 start - 
 decapsulate a tls record
 
@@ -50,9 +38,7 @@ once you have plaintext -
    - [ ] 
    strip any trailing 0 bytes
    - [ ]
-  strip last nonzero byte - check that it's equl to 17 (hex) which is tag for application data
-
-will be http traffic
+  strip last nonzero byte - check that it's equl to 17 (hex) which is tag for application data (will be http traffic)
 
 - [ ] 
 inputs to aes gcm function
@@ -84,4 +70,16 @@ inputs to aes gcm function
          92 a2 97 70 14 bd 1e 3d ea e6 3a ee bb 21 69 49 15 e4
 
 
+## Project ideas
 
+Idea 1:
+
+Verify TLS communication. (ChatGPT output verification?)
+
+Idea 2:
+
+Verify credit score based on chain loan data to save gas.
+
+Idea 3:
+
+Verify total trading volume on DEXs for HarryPotterObamaSonic10Inu (ETH) to get listed on CEXs. 

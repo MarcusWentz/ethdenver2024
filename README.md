@@ -1,18 +1,20 @@
 # ethdenver2024
 
-Concept idea 1:
+## Project ideas
+
+Idea 1:
 
 Verify ChatGPT output with JSON API response verification.
 
-Concept idea 2:
+Idea 2:
 
 Verify credit score based on chain loan data to save gas.
 
-Concept idea 3:
+Idea 3:
 
 Verify total trading volume on DEXs for HarryPotterObamaSonic10Inu (ETH) to get listed on CEXs. 
 
-
+## Idea 1 Next Steps
 
 get an enum
 ordered list of messages, either client or server

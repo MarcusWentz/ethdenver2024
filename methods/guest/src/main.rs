@@ -33,13 +33,13 @@ struct KeyData {
 // Decodes IN PLACE - mutates the input ciphertext
 fn decode_message(
     ciphertext_vec: &mut Vec<u8>,
-    associated_data_vec: &Vec<u8>,
+    metadata_vec: &Vec<u8>,
     iv_expanded: &[u8; 12],
     key_expanded: &[u8; 16],
 ) {
     let cipher = Aes128Gcm::new(key_expanded.into());
     let nonce = iv_expanded;
-    let success = cipher.decrypt_in_place(nonce.into(), associated_data_vec, ciphertext_vec);
+    let success = cipher.decrypt_in_place(nonce.into(), metadata_vec, ciphertext_vec);
     assert!(success.is_ok());
 }
 
@@ -59,7 +59,16 @@ fn do_iv_xor(sequence_num: u64, iv_expanded: &[u8; 12]) -> [u8; 12] {
 
 fn main() {
     let message = Message::Client(hex::decode("1703030043a23f7054b62c94d0affafe8228ba55cbefacea42f914aa66bcab3f2b9819a8a5b46b395bd54a9a20441e2b62974e1f5a6292a2977014bd1e3deae63aeebb21694915e4").unwrap());
-    let key_data = KeyData {
+    let key_data_client = KeyData {
+        iv_expanded: [
+            0x5b, 0x78, 0x92, 0x3d, 0xee, 0x08, 0x57, 0x90, 0x33, 0xe5, 0x23, 0xd9,
+        ],
+        key_expanded: [
+            0x17, 0x42, 0x2d, 0xda, 0x59, 0x6e, 0xd5, 0xd9, 0xac, 0xd8, 0x90, 0xe3, 0xc6, 0x3f,
+            0x50, 0x51,
+        ],
+    };
+    let key_data_server = KeyData {
         iv_expanded: [
             0x5b, 0x78, 0x92, 0x3d, 0xee, 0x08, 0x57, 0x90, 0x33, 0xe5, 0x23, 0xd9,
         ],
@@ -69,15 +78,47 @@ fn main() {
         ],
     };
 
-    // Decoding message example
-    let ciphertext = "a23f7054b62c94d0affafe8228ba55cbefacea42f914aa66bcab3f2b9819a8a5b46b395bd54a9a20441e2b62974e1f5a6292a2977014bd1e3deae63aeebb21694915e4";
-    let associated_data = "1703030043";
-    let mut ciphertext_vec = hex::decode(ciphertext).unwrap();
-    let associated_data_vec = hex::decode(associated_data).unwrap();
+    // Need to separate actual cyphertext and metadata
+    // let ciphertext = "a23f7054b62c94d0affafe8228ba55cbefacea42f914aa66bcab3f2b9819a8a5b46b395bd54a9a20441e2b62974e1f5a6292a2977014bd1e3deae63aeebb21694915e4";
+    // let associated_data = "1703030043";
+    let mut ciphertext_vec;
+    let metadata_vec;
+    let key_data;
+    match message {
+        Message::Client(ciphertext) => {
+            ciphertext_vec = ciphertext[5..].to_vec();
+            metadata_vec = ciphertext[0..5].to_vec();
+            key_data = key_data_client;
+            println!("Client message: {:?}", ciphertext);
+            println!("LEN: {:?}", ciphertext_vec.len());
+            println!("LEN2: {:?}", ciphertext.len());
+        }
+        Message::Server(ciphertext) => {
+            ciphertext_vec = ciphertext[5..].to_vec();
+            metadata_vec = ciphertext[0..5].to_vec();
+            key_data = key_data_server;
+            println!("Server message: {:?}", ciphertext);
+        }
+    }
 
+    // Perform checks before decrypting:
+    // First check - initial 3 bytes should always be (hex string) "170303"
+    let record_first_three_bytes = &metadata_vec[0..3];
+    let record_length_bytes = &metadata_vec[3..5];
+    assert!(record_first_three_bytes == [23, 3, 3]);
+    println!("Encoded hex string starts with 170303 as expected.");
+
+    // Second check - length should match the length of the ciphertext
+    let mut flag_len: u16 = 0;
+    for byte in record_length_bytes {
+        flag_len = (flag_len << 8) | *byte as u16;
+    }
+    assert!(flag_len as usize == ciphertext_vec.len());
+
+    // Now that we've confirmed message is valid, we can decode
     decode_message(
         &mut ciphertext_vec,
-        &associated_data_vec,
+        &metadata_vec,
         &key_data.iv_expanded,
         &key_data.key_expanded,
     );
@@ -90,27 +131,7 @@ fn main() {
     println!("RESULT:");
     println!("{:?}", xored);
 
-    //Test
-    // let complete_record = "17 03 03 00 43 a2 3f 70 54 b6 2c 94
-    // d0 af fa fe 82 28 ba 55 cb ef ac ea 42 f9 14 aa 66 bc ab 3f 2b
-    // 98 19 a8 a5 b4 6b 39 5b d5 4a 9a 20 44 1e 2b 62 97 4e 1f 5a 62
-    // 92 a2 97 70 14 bd 1e 3d ea e6 3a ee bb 21 69 49 15 e4";
-    // Removed white spaces with: https://www.browserling.com/tools/remove-all-whitespace
-    let complete_record = "1703030043a23f7054b62c94d0affafe8228ba55cbefacea42f914aa66bcab3f2b9819a8a5b46b395bd54a9a20441e2b62974e1f5a6292a2977014bd1e3deae63aeebb21694915e4";
-    println!("{:?}", complete_record);
-
-    let record_first_three_bytes = &complete_record[0..6];
-    println!("{:?}", record_first_three_bytes);
-
-    if record_first_three_bytes != "170303" {
-        println!("ERROR: Encoded hex string does not start with 170303.");
-        return;
-    }
-    println!("Encoded hex string starts with 170303 as expected.");
-
-    let decoded_string = hex::decode(complete_record);
-    println!("{:?}", decoded_string); //
-
+    ////////// Tested input
     //Input
     let data: String = env::read();
     let sha = *Impl::hash_bytes(&data.as_bytes());

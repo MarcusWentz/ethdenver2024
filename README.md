@@ -58,17 +58,3 @@ and will get back plaintext
          d0 af fa fe 82 28 ba 55 cb ef ac ea 42 f9 14 aa 66 bc ab 3f 2b
          98 19 a8 a5 b4 6b 39 5b d5 4a 9a 20 44 1e 2b 62 97 4e 1f 5a 62
          92 a2 97 70 14 bd 1e 3d ea e6 3a ee bb 21 69 49 15 e4
-
-## Project ideas
-
-Idea 1:
-
-Verify TLS communication. (ChatGPT output verification?)
-
-Idea 2:
-
-Verify credit score based on chain loan data to save gas.
-
-Idea 3:
-
-Verify total trading volume on DEXs for HarryPotterObamaSonic10Inu (ETH) to get listed on CEXs. 

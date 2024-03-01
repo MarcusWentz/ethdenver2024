@@ -20,6 +20,16 @@ use httparse::Response as ParsedResponse;
 use json::parse;
 use json_core::Outputs;
 
+enum Message {
+    Client(Vec<u8>), // message like we had earlier
+    Server(Vec<u8>), //same thing
+}
+
+struct KeyData {
+    iv_expanded: [u8; 12],
+    key_expanded: [u8; 16],
+}
+
 // Decodes IN PLACE - mutates the input ciphertext
 fn decode_message(
     ciphertext_vec: &mut Vec<u8>,

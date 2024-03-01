@@ -4,3 +4,6 @@
 [submodule "tls_garble"]
 	path = tls_garble
 	url = https://github.com/mrnerdhair/tls_garble
+[submodule "crunch"]
+	path = crunch
+	url = https://github.com/mrnerdhair/crunch.git

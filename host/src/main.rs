@@ -10,7 +10,7 @@ fn main() {
 
     let outputs = search_json(data);
     println!();
-    println!("  {:?}", outputs.hash);
+    // println!("  {:?}", outputs.hash);
     println!(
         "provably contains a field 'critical_data' with value {}",
         outputs.data

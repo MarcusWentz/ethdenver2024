@@ -33,6 +33,20 @@ fn decode_message(
     assert!(success.is_ok());
 }
 
+fn do_iv_xor(sequence_num: u64, iv_expanded: &[u8; 12]) -> [u8; 12] {
+    // take sequence number
+    // treat it as a 64 bit number, turn it into bytes big endian - pad to the left with 0s, and then xor with iv
+    let mut sequence_num_padded = [0u8; 12]; // Pad with 4 bytes
+    sequence_num_padded[4..].copy_from_slice(&sequence_num.to_be_bytes()); // Copy the original bytes to the right side
+
+    let mut result = [0u8; 12];
+    for i in 0..12 {
+        result[i] = sequence_num_padded[i] ^ iv_expanded[i];
+    }
+
+    result
+}
+
 fn main() {
     // Decoding message example
     let iv_expanded: [u8; 12] = [
@@ -56,6 +70,12 @@ fn main() {
     );
     println!("RESULT:");
     println!("{:?}", ciphertext_vec);
+
+    // IV XOR example
+    let sequence_num: u64 = 1234567890;
+    let xored: [u8; 12] = do_iv_xor(sequence_num, &iv_expanded);
+    println!("RESULT:");
+    println!("{:?}", xored);
 
     //Test
     // let complete_record = "17 03 03 00 43 a2 3f 70 54 b6 2c 94

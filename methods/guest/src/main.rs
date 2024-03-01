@@ -58,15 +58,18 @@ fn do_iv_xor(sequence_num: u64, iv_expanded: &[u8; 12]) -> [u8; 12] {
 }
 
 fn main() {
-    // Decoding message example
-    let iv_expanded: [u8; 12] = [
-        0x5b, 0x78, 0x92, 0x3d, 0xee, 0x08, 0x57, 0x90, 0x33, 0xe5, 0x23, 0xd9,
-    ];
-    let key_expanded: [u8; 16] = [
-        0x17, 0x42, 0x2d, 0xda, 0x59, 0x6e, 0xd5, 0xd9, 0xac, 0xd8, 0x90, 0xe3, 0xc6, 0x3f, 0x50,
-        0x51,
-    ];
+    let message = Message::Client(hex::decode("1703030043a23f7054b62c94d0affafe8228ba55cbefacea42f914aa66bcab3f2b9819a8a5b46b395bd54a9a20441e2b62974e1f5a6292a2977014bd1e3deae63aeebb21694915e4").unwrap());
+    let key_data = KeyData {
+        iv_expanded: [
+            0x5b, 0x78, 0x92, 0x3d, 0xee, 0x08, 0x57, 0x90, 0x33, 0xe5, 0x23, 0xd9,
+        ],
+        key_expanded: [
+            0x17, 0x42, 0x2d, 0xda, 0x59, 0x6e, 0xd5, 0xd9, 0xac, 0xd8, 0x90, 0xe3, 0xc6, 0x3f,
+            0x50, 0x51,
+        ],
+    };
 
+    // Decoding message example
     let ciphertext = "a23f7054b62c94d0affafe8228ba55cbefacea42f914aa66bcab3f2b9819a8a5b46b395bd54a9a20441e2b62974e1f5a6292a2977014bd1e3deae63aeebb21694915e4";
     let associated_data = "1703030043";
     let mut ciphertext_vec = hex::decode(ciphertext).unwrap();
@@ -75,15 +78,15 @@ fn main() {
     decode_message(
         &mut ciphertext_vec,
         &associated_data_vec,
-        &iv_expanded,
-        &key_expanded,
+        &key_data.iv_expanded,
+        &key_data.key_expanded,
     );
     println!("RESULT:");
     println!("{:?}", ciphertext_vec);
 
     // IV XOR example
     let sequence_num: u64 = 1234567890;
-    let xored: [u8; 12] = do_iv_xor(sequence_num, &iv_expanded);
+    let xored: [u8; 12] = do_iv_xor(sequence_num, &key_data.iv_expanded);
     println!("RESULT:");
     println!("{:?}", xored);
 

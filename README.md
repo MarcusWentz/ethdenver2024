@@ -1,60 +1,32 @@
-# ethdenver2024
+# RISC TLS 1.3
+
+Built for the ETH Denver 2024 Hackathon.
+
+## About
+
+RISC TLS 1.3 leverages RISC Zero and multiparty computation to let users securely prove communication with a webserver.
+
+Our solution aims to address the challenge of verifying the authenticity of encrypted conversations (such as those over HTTPS) in a decentralized and privacy-preserving manner. It leverages RISC Zero proofs to enable smart contracts to interact with Web3 actions based on potentially private Web2 data.
+
+The core problem revolves around proving the integrity of encrypted communications without revealing sensitive information to third parties. For instance, if you wish to validate a conversation with an AI model like ChatGPT without exposing the content of the conversation itself, traditional methods fall short. This is because the encryption keys required to decrypt the communication are the same ones needed to fabricate it, posing a credibility issue.
+
+Our system employs Multi-Party Computation to establish trust without revealing content.  The key components that make it work are:
+
+Key Generation: A group of notaries collaborates to generate a private key. The client interacts with a website or API over HTTPS using this key.
+
+Content Commitment: Before gaining access to the decryption keys, the client commits to the hash of the message contents. This commitment ensures that the client cannot modify the message after decryption.
+
+Notary Verification: The notaries, unaware of the message content, verify the hash commitment. They sign the hash to attest to its authenticity.
+
+RISC Zero Proofs: Using the notary-signed hash and other relevant data, RISC Zero proofs are constructed to verify the authenticity of the conversation and any specific properties of interest, like server authentication or specific API interactions.
+
+Verification: These proofs can be verified on-chain or off-chain, enabling trustless validation of encrypted communications.
+
+For our demo we prove a ChatGPT response, but any Web2 data could be proved and put onchain.
 
 ## Run
 
 In root path, run
 ```shell
-RISC0_DEV_MODE=1 cargo run --release
+cargo run --release
 ```
-
-## Idea 1 - Verify TLS communication - TO DO LIST
-
-- [ ] get an enum
-ordered list of messages, either client or server
-
-- [ ] start - decapsulate a tls record
-
-- [x] 17 03 03 - always first bytes
-u16 big endian length field - check that it matches
-rest if cyphertext
-last 16 bytes are authtag, but 
-pass the rest in
-
-- [ ] (assuming we know the key)
-when we decrypt it
-
-- [ ] need aes 128 gcm library to decrypt it
-feed it the key and bag of bytes
-and will get back plaintext
-
-- [ ] once you have plaintext:
-   - [ ] 
-   strip any trailing 0 bytes
-   - [ ]
-  strip last nonzero byte - check that it's equl to 17 (hex) which is tag for application data (will be http traffic)
-
-- [ ] inputs to aes gcm function
-   {client}  derive write traffic keys for application data:
-
-      PRK (32 octets):  9e 40 64 6c e7 9a 7f 9d c0 5a f8 88 9b ce 65 52
-         87 5a fa 0b 06 df 00 87 f7 92 eb b7 c1 75 04 a5
-
-      key info (13 octets):  00 10 09 74 6c 73 31 33 20 6b 65 79 00
-
-      key expanded (16 octets):  17 42 2d da 59 6e d5 d9 ac d8 90 e3 c6
-         3f 50 51
-
-      iv info (12 octets):  00 0c 08 74 6c 73 31 33 20 69 76 00
-
-      iv expanded (12 octets):  5b 78 92 3d ee 08 57 90 33 e5 23 d9
-
-   {client}  send application_data record:
-
-      payload (50 octets):  00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e
-         0f 10 11 12 13 14 15 16 17 18 19 1a 1b 1c 1d 1e 1f 20 21 22 23
-         24 25 26 27 28 29 2a 2b 2c 2d 2e 2f 30 31
-
-      complete record (72 octets):  17 03 03 00 43 a2 3f 70 54 b6 2c 94
-         d0 af fa fe 82 28 ba 55 cb ef ac ea 42 f9 14 aa 66 bc ab 3f 2b
-         98 19 a8 a5 b4 6b 39 5b d5 4a 9a 20 44 1e 2b 62 97 4e 1f 5a 62
-         92 a2 97 70 14 bd 1e 3d ea e6 3a ee bb 21 69 49 15 e4

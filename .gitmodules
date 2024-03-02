@@ -7,6 +7,3 @@
 [submodule "crunch"]
 	path = crunch
 	url = https://github.com/mrnerdhair/crunch.git
-[submodule "crunch2"]
-	path = crunch2
-	url = https://github.com/mrnerdhair/crunch.git
